@@ -63,16 +63,11 @@ public class ReservationService {
     }
 
     public void deleteReservationByAdmin(Long id) {
-        Reservation reservation = findReservation(id);
-
-        reservationRepository.deleteById(reservation.id());
+        deleteReservation(id, false);
     }
 
     public void cancelReservation(Long id) {
-        Reservation reservation = findReservation(id);
-
-        validateNotPastReservation(reservation);
-        reservationRepository.deleteById(reservation.id());
+        deleteReservation(id, true);
     }
 
     public Reservation changeReservationDateTime(Long id, ReservationUpdateCommand command) {
@@ -94,6 +89,16 @@ public class ReservationService {
                 reservationTime,
                 reservation.theme()
         );
+    }
+
+    private void deleteReservation(Long id, boolean shouldValidate) {
+        Reservation reservation = findReservation(id);
+
+        if (shouldValidate) {
+            validateNotPastReservation(reservation);
+        }
+
+        reservationRepository.deleteById(reservation.id());
     }
 
     private void validateReservableDateTime(LocalDate date, LocalTime startAt) {
