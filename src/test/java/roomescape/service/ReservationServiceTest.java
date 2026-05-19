@@ -260,14 +260,18 @@ class ReservationServiceTest {
         Reservation reservation = createReservation(reservationId, "브라운", LocalDate.now().plusDays(1));
         ReservationTime changedTime = new ReservationTime(2L, LocalTime.of(11, 0));
         ReservationUpdateCommand updateCommand = new ReservationUpdateCommand(changedDate, 2L);
+        Reservation updatedReservation = new Reservation(reservationId, "브라운", changedDate, changedTime,
+                reservation.theme());
 
-        given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
+        given(reservationRepository.findById(reservationId))
+                .willReturn(Optional.of(reservation), Optional.of(updatedReservation));
         given(reservationTimeRepository.findById(2L)).willReturn(Optional.of(changedTime));
         given(reservationRepository.existsConflictingReservation(changedDate, 2L, THEME_ID, reservationId))
                 .willReturn(false);
 
         Reservation changedReservation = reservationService.changeReservationDateTime(reservationId, updateCommand);
 
+        assertThat(changedReservation).isSameAs(updatedReservation);
         assertThat(changedReservation.id()).isEqualTo(reservationId);
         assertThat(changedReservation.name()).isEqualTo("브라운");
         assertThat(changedReservation.date()).isEqualTo(changedDate);

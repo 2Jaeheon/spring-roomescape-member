@@ -82,13 +82,7 @@ public class ReservationService {
 
         reservationRepository.updateDateTime(reservation.id(), command.date(), command.timeId());
 
-        return new Reservation(
-                reservation.id(),
-                reservation.name(),
-                command.date(),
-                reservationTime,
-                reservation.theme()
-        );
+        return findReservation(reservation.id());
     }
 
     private void deleteReservation(Long id, boolean shouldValidate) {
